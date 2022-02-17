@@ -2,17 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Asteroid_Medium : MonoBehaviour
+public class Asteroid_Medium : Asteroid
 {
-    // Start is called before the first frame update
-    void Start()
+    public GameObject smallAsteroidPref;
+    private void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        asteroidToSpawn = smallAsteroidPref;
     }
 }

@@ -3,43 +3,33 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : Singleton<PlayerController>
 {
-
-    public static PlayerController playerControllerInstance;
-
+    [Header("Projectiles")]
     public GameObject projectilePref;
     public List<GameObject> projectilesList;
+
 
     private PlayerInput playerInputActions;
     private float playerRotation = 0;
     private Rigidbody rb;
     private float playerThrustActivated;
 
+
+    [Header("Movement Settings")]
     public float thrustForce;
     public float rotationSpeed;
+    public float warpDistance;
 
 
-    private void Awake()
+    private void Start()
     {
         playerInputActions = new PlayerInput();
         playerInputActions.Enable();
-        if (playerControllerInstance != null)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            playerControllerInstance = this;
-        }
-    }
-
-    
-    private void Start()
-    {
         rb = GetComponent<Rigidbody>();
     }
 
+    
 
     private void FixedUpdate()
     {
@@ -56,10 +46,21 @@ public class PlayerController : MonoBehaviour
     }
 
 
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Destructible" || other.tag == "EnemyProjectile")
+        {
+            GameManager.instance.loseLife();
+        }
+    }
+
+
+
     //read player input for Spacebar(shoot), evoke player event using Input System
     public void Shoot(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && GameManager.instance.isPaused == false)
         {
             //Spawn projectile and shoot it
             //Manage projectile instance
@@ -70,10 +71,36 @@ public class PlayerController : MonoBehaviour
     }
 
 
+    public void Pause(InputAction.CallbackContext context)
+    {
+        GameManager.instance.PauseGame();
+    }
+
+
+    public void Warp(InputAction.CallbackContext context)
+    {
+        if(context.performed)
+            transform.position += transform.up * warpDistance;
+    }
+
+
+
     public void DestroyProjectile(GameObject projectile)
     {
         projectilesList.Remove(projectile);
         Destroy(projectile);
+    }
+
+
+    public void OnApplicationQuit()
+    {
+        if(projectilesList.Count > 0)
+        {
+            foreach (GameObject item in projectilesList)
+            {
+                Destroy(item);
+            }
+        }
     }
 
 }

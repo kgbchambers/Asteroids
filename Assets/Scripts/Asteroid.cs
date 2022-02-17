@@ -2,17 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour
+public class Asteroid : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public GameObject asteroidToSpawn;
+    public float movementSpeed;
+
+    protected void Awake()
     {
-        
+        float randomVal = Random.Range(0, 360);
+        Vector3 direction = new Vector3(0, 0, randomVal); ;
+        transform.Rotate(direction);
     }
 
-    // Update is called once per frame
-    void Update()
+    protected void Update()
     {
-        
+        transform.position += transform.right * movementSpeed * Time.deltaTime;
+    }
+
+    public virtual void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Projectile" || other.tag == "Player")
+        {
+            GameManager.instance.updateScore();
+            GameObject asteroidInstanceOne = Instantiate(asteroidToSpawn, transform.position, Quaternion.identity);
+            GameManager.instance.addAsteroid(asteroidInstanceOne);
+            GameObject asteroidInstanceTwo = Instantiate(asteroidToSpawn, transform.position, Quaternion.identity);
+            GameManager.instance.addAsteroid(asteroidInstanceTwo);
+            GameManager.instance.destroyAsteroid(gameObject);
+        }
     }
 }

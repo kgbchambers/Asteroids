@@ -13,12 +13,15 @@ public class Projectile : MonoBehaviour
 
     private void FixedUpdate()
     {
-        transform.position += transform.up * projectileSpeed;
+        transform.position += transform.up * projectileSpeed * Time.deltaTime;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        
+        if(other.tag == "Destructible")
+        {
+            gameObject.SetActive(false);
+            Destroy(gameObject);
+        }
     }
-
 }
